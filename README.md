@@ -1,0 +1,2 @@
+# SpotDeck
+My Spotify display
