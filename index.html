@@ -425,6 +425,20 @@
         <span id="device" class="device text-xs sm:text-sm text-neutral-400 truncate">Device: —</span>
       </div>
       
+      <!-- Main-page playback controls -->
+      <div id="mainPlaybackControls" class="flex items-center justify-center gap-3" aria-label="Playback controls">
+        <button id="mainPrevBtn" type="button" aria-label="Previous track" title="Previous track" class="control-btn" style="width:42px;height:42px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><rect x="4" y="5" width="2" height="14"/></svg>
+        </button>
+        <button id="mainPlayPauseBtn" type="button" aria-label="Play or pause" title="Play/Pause" class="control-btn primary" style="width:48px;height:48px;">
+          <svg id="mainPlayIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="mainPauseIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button id="mainNextBtn" type="button" aria-label="Next track" title="Next track" class="control-btn" style="width:42px;height:42px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><rect x="18" y="5" width="2" height="14"/></svg>
+        </button>
+      </div>
+
       <!-- Action Buttons -->
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
         <button id="connect" aria-label="Connect to Spotify" class="bg-green-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/30 active:scale-95 text-center">
@@ -636,7 +650,12 @@
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
     volumeSlider: document.getElementById('volumeSlider'),
-    volumeValue: document.getElementById('volumeValue')
+    volumeValue: document.getElementById('volumeValue'),
+    mainPlayPauseBtn: document.getElementById('mainPlayPauseBtn'),
+    mainPlayIcon: document.getElementById('mainPlayIcon'),
+    mainPauseIcon: document.getElementById('mainPauseIcon'),
+    mainPrevBtn: document.getElementById('mainPrevBtn'),
+    mainNextBtn: document.getElementById('mainNextBtn')
   };
 
   function msToTime(ms) { const s = Math.floor(ms / 1000); const m = Math.floor(s / 60); const ss = s % 60; return `${m}:${ss.toString().padStart(2,'0')}`; }
@@ -1341,13 +1360,17 @@
       els.volumeValue.textContent = `${data.device.volume_percent}%`;
     }
     
-    // Update play/pause button
+    // Update play/pause icons in both the popup and main-page controls
     if (isPlaying) {
       els.playIcon.style.display = 'none';
       els.pauseIcon.style.display = 'block';
+      els.mainPlayIcon.style.display = 'none';
+      els.mainPauseIcon.style.display = 'block';
     } else {
       els.playIcon.style.display = 'block';
       els.pauseIcon.style.display = 'none';
+      els.mainPlayIcon.style.display = 'block';
+      els.mainPauseIcon.style.display = 'none';
     }
 
     if (animFrame) cancelAnimationFrame(animFrame);
@@ -1522,6 +1545,20 @@
     await skipPrevious();
   });
   
+  // Main-page playback controls (same Spotify actions as the popup)
+  els.mainPlayPauseBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    playPause();
+  });
+  els.mainNextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    skipNext();
+  });
+  els.mainPrevBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    skipPrevious();
+  });
+
   // Volume control
   let volumeDebounce = null;
   els.volumeSlider.addEventListener('input', (e) => {
